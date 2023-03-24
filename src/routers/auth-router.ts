@@ -115,16 +115,18 @@ authRouter
     const refreshToken = req.cookies['refreshToken'];
     if (!refreshToken) {
         return res.status(401).send('Access Denied. No refresh token provided.');
-    }
+
+    } else {
         const decodeAndCreateNewTokens = await jwtService.tryDecodeAndCreate(refreshToken)
 
         if (!decodeAndCreateNewTokens) {
             res.status(401).send('Invalid refresh token')
         } else {
             res.status(200)
-                .cookie('refreshToken', decodeAndCreateNewTokens.refreshToken, { httpOnly: true, sameSite: 'strict' })
+                .cookie('refreshToken', decodeAndCreateNewTokens.refreshToken, { httpOnly: true, secure: 'true' })
                 .json({"accessToken": decodeAndCreateNewTokens.accessToken})
         }
+    }
 })
 
     .post("/logout", async (req:Request, res: Response) => {
