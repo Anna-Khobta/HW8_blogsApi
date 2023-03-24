@@ -32,7 +32,7 @@ authRouter
                 const jwtResult = await jwtService.createJwtToken(foundUserInDb)
 
                 res
-                    .cookie('refreshToken', jwtResult.refreshToken, { httpOnly: true, secure: 'true' })
+                    .cookie('refreshToken', jwtResult.refreshToken, { httpOnly: true,sameSite: "none"})  //secure: 'true' })
                     .json({"accessToken": jwtResult.accessToken})
                     .status(200)
 
@@ -112,7 +112,8 @@ authRouter
 
     .post("/refresh-token", async (req:Request, res: Response) => {
 
-    const refreshToken = req.cookies['refreshToken'];
+    const refreshToken = req.cookies['refreshToken']
+
     if (!refreshToken) {
         return res.status(401).send('Access Denied. No refresh token provided.');
 
@@ -123,7 +124,7 @@ authRouter
             res.status(401).send('Invalid refresh token')
         } else {
             res.status(200)
-                .cookie('refreshToken', decodeAndCreateNewTokens.refreshToken, { httpOnly: true, secure: 'true' })
+                .cookie('refreshToken', decodeAndCreateNewTokens.refreshToken, { httpOnly: true, sameSite: "none"}) //secure: 'true' })
                 .json({"accessToken": decodeAndCreateNewTokens.accessToken})
         }
     }
