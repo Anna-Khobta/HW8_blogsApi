@@ -31,9 +31,10 @@ authRouter
             if (login) {
                 const jwtResult = await jwtService.createJwtToken(foundUserInDb)
 
-                res.status(200)
-                    .cookie('refreshToken', jwtResult.refreshToken, { httpOnly: true, sameSite: 'strict' })
+                res
+                    .cookie('refreshToken', jwtResult.refreshToken, { httpOnly: true, secure: 'true' })
                     .json({"accessToken": jwtResult.accessToken})
+                    .status(200)
 
             } else {
                 res.sendStatus(401)
