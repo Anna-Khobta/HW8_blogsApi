@@ -1,4 +1,4 @@
-import jwt, {JwtPayload} from 'jsonwebtoken'
+import jwt from 'jsonwebtoken'
 import {UserDbType} from "../repositories/types";
 import {settings} from "../settings";
 import {revokedTokenService} from "../domain/revoked-token-service";

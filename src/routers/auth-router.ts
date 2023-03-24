@@ -13,8 +13,6 @@ import {usersService} from "../domain/users-service";
 import {jwtService} from "../application/jwt-service";
 import {authBearerMiddleware} from "../middlewares/authToken";
 import {authService} from "../domain/auth-service";
-import {revokedTokenService} from "../domain/revoked-token-service";
-import {el} from "date-fns/locale";
 
 export const authRouter = Router({})
 
