@@ -7,16 +7,19 @@ import {
     passwordValidation
 } from "../middlewares/authentication";
 import {inputValidationMiddleware} from "../middlewares/input-validation-middleware";
-import {Request, Response, Router} from "express";
+import {Request, response, Response, Router} from "express";
 import {usersRepository} from "../repositories/users-db-repositories";
 import {usersService} from "../domain/users-service";
 import {jwtService} from "../application/jwt-service";
 import {authBearerMiddleware} from "../middlewares/authToken";
 import {authService} from "../domain/auth-service";
+import {revokedTokenService} from "../domain/revoked-token-service";
+import {el} from "date-fns/locale";
 
 export const authRouter = Router({})
 
-authRouter.post("/login",
+authRouter
+    .post("/login",
     loginOrEmailValidation,
     passwordValidation,
     inputValidationMiddleware,
@@ -25,16 +28,14 @@ authRouter.post("/login",
         let foundUserInDb = await usersRepository.checkUserLoginOrEmail(req.body.loginOrEmail)
 
         if (foundUserInDb) {
-
             let login = await usersService.loginUser(foundUserInDb, req.body.loginOrEmail, req.body.password)
 
             if (login) {
+                const jwtResult = await jwtService.createJwtToken(foundUserInDb)
 
-                const token = await jwtService.createJwtToken(foundUserInDb)
-
-                res.status(200).json({
-                    "accessToken": token
-                })
+                res.status(200)
+                    .cookie('refreshToken', jwtResult.refreshToken, { httpOnly: true, sameSite: 'strict' })
+                    .json({"accessToken": jwtResult.accessToken})
 
             } else {
                 res.sendStatus(401)
@@ -45,7 +46,7 @@ authRouter.post("/login",
 
     })
 
-authRouter.get("/me",
+    .get("/me",
     authBearerMiddleware,
     async (req:Request, res: Response) => {
 
@@ -63,7 +64,7 @@ authRouter.get("/me",
 
 
 // Registration in the system. Email with confirmation code will be send to passed email address
-authRouter
+
     .post("/registration",
     loginValidation,
     passwordValidation,
@@ -96,7 +97,7 @@ authRouter
         })
 
 
-.post("/registration-email-resending",
+    .post("/registration-email-resending",
     emailValidationSimple,
     checkUserEmailInbase,
     inputValidationMiddleware,
@@ -110,4 +111,38 @@ authRouter
         }
 })
 
+    .post("/refresh-token", async (req:Request, res: Response) => {
+
+    const refreshToken = req.cookies['refreshToken'];
+    if (!refreshToken) {
+        return res.status(401).send('Access Denied. No refresh token provided.');
+    }
+        const decodeAndCreateNewTokens = await jwtService.tryDecodeAndCreate(refreshToken)
+
+        if (!decodeAndCreateNewTokens) {
+            res.status(401).send('Invalid refresh token')
+        } else {
+            res.status(200)
+                .cookie('refreshToken', decodeAndCreateNewTokens.refreshToken, { httpOnly: true, sameSite: 'strict' })
+                .json({"accessToken": decodeAndCreateNewTokens.accessToken})
+        }
+})
+
+    .post("/logout", async (req:Request, res: Response) => {
+
+        const refreshToken = req.cookies['refreshToken'];
+
+        if (!refreshToken) {
+            return res.status(401).send('Access Denied. No refresh token provided.');
+        } else {
+
+            const verifyRefreshToken = await jwtService.verifyToken(refreshToken)
+
+            if (!verifyRefreshToken) {
+                res.status(401).send('Invalid refresh token')
+            } else {
+                res.status(204)
+            }
+        }
+    })
 

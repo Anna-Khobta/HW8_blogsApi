@@ -13,16 +13,6 @@ export const usersService= {
 
         const hashPassword = await bcrypt.hash(password, salt)
 
-        // bcrypt.hashSync(password, salt);
-
-/*        const newUser = {
-            id: (+(new Date())).toString(),
-            login: login,
-            email: email,
-            password: hashPassword,
-            createdAt: (new Date()).toISOString()
-        }*/
-
         const newUserDBType = {
             id: (+(new Date())).toString(),
             accountData: {

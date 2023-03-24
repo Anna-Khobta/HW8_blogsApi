@@ -69,3 +69,7 @@ export type UserDbType = {
     }
 }
 
+export type TokenDBType = {
+   token: string;
+    exp: Date;
+}

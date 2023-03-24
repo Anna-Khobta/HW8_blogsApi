@@ -19,6 +19,7 @@ export const app = express()
 
 app.use(express.json())
 
+
 app.get('/', (req: Request, res: Response ) => {
     let helloMessage = 'Hello Samurai!'
     res.send(helloMessage)
