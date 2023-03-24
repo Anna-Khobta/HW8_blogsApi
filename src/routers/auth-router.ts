@@ -122,7 +122,7 @@ authRouter
 
         if (decodeAndCreateNewTokens) {
             return res.status(200)
-                .cookie('refreshToken', decodeAndCreateNewTokens.refreshToken, { httpOnly: true, secure: 'true' }) // sameSite: "none"})
+                .cookie('refreshToken', decodeAndCreateNewTokens.refreshToken, { httpOnly: true,  secure: 'true' }) // sameSite: "none"})
                 .json({"accessToken": decodeAndCreateNewTokens.accessToken})
         } else {
             res.status(401).send('Invalid refresh token')

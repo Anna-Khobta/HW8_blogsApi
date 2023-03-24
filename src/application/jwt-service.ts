@@ -72,11 +72,12 @@ export const jwtService = {
 
     async verifyToken(refreshToken: string) {
 
+        try {
         const decodedRefreshToken: any = jwt.verify(refreshToken, settings.JWT_SECRET)
 
-        if (!decodedRefreshToken) {
-            return null
-        }
+        }  catch (error) {
+        return null
+    }
             const checkRefreshTokenInDb = await tokenRepositories.findToken(refreshToken)
             if (checkRefreshTokenInDb) {
                 return null
