@@ -32,7 +32,7 @@ authRouter
                 const jwtResult = await jwtService.createJwtToken(foundUserInDb)
 
                 res
-                    .cookie('refreshToken', jwtResult.refreshToken, { httpOnly: true,sameSite: "none"})  //secure: 'true' })
+                    .cookie('refreshToken', jwtResult.refreshToken, { httpOnly: true, secure: 'true' }) // sameSite: "none"})
                     .json({"accessToken": jwtResult.accessToken})
                     .status(200)
 
@@ -120,12 +120,12 @@ authRouter
     } else {
         const decodeAndCreateNewTokens = await jwtService.tryDecodeAndCreate(refreshToken)
 
-        if (!decodeAndCreateNewTokens) {
-            res.status(401).send('Invalid refresh token')
-        } else {
-            res.status(200)
-                .cookie('refreshToken', decodeAndCreateNewTokens.refreshToken, { httpOnly: true, sameSite: "none"}) //secure: 'true' })
+        if (decodeAndCreateNewTokens) {
+            return res.status(200)
+                .cookie('refreshToken', decodeAndCreateNewTokens.refreshToken, { httpOnly: true, secure: 'true' }) // sameSite: "none"})
                 .json({"accessToken": decodeAndCreateNewTokens.accessToken})
+        } else {
+            res.status(401).send('Invalid refresh token')
         }
     }
 })
