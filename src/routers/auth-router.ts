@@ -32,7 +32,7 @@ authRouter
                 const jwtResult = await jwtService.createJwtToken(foundUserInDb)
 
                 res
-                    .cookie('refreshToken', jwtResult.refreshToken, { httpOnly: true, secure: 'true' }) // sameSite: "none"})
+                    .cookie('refreshToken', jwtResult.refreshToken, { httpOnly: true,  secure: 'true' }) // sameSite: "none"})
                     .json({"accessToken": jwtResult.accessToken})
                     .status(200)
 
@@ -122,7 +122,7 @@ authRouter
 
         if (decodeAndCreateNewTokens) {
             return res.status(200)
-                .cookie('refreshToken', decodeAndCreateNewTokens.refreshToken, { httpOnly: true,  secure: 'true' }) // sameSite: "none"})
+                .cookie('refreshToken', decodeAndCreateNewTokens.refreshToken, { httpOnly: true,   secure: 'true' }) // sameSite: "none"})
                 .json({"accessToken": decodeAndCreateNewTokens.accessToken})
         } else {
             res.status(401).send('Invalid refresh token')
@@ -136,15 +136,16 @@ authRouter
 
         if (!refreshToken) {
             return res.status(401).send('Access Denied. No refresh token provided.');
-        } else {
+        }
+
 
             const verifyRefreshToken = await jwtService.verifyToken(refreshToken)
+        console.log(verifyRefreshToken)
 
-            if (!verifyRefreshToken) {
-                res.status(401).send('Invalid refresh token')
+            if (verifyRefreshToken) {
+                return res.sendStatus(204)
             } else {
-                res.status(204)
-            }
+                return res.status(401).send('Invalid refresh token')
         }
-    })
+        })
 

@@ -30,6 +30,8 @@ export const jwtService = {
 
     async tryDecodeAndCreate(refreshToken: string) {
 
+        // как лучше сделать?
+
         try {
 
         const decodedRefreshToken: any = jwt.verify(refreshToken, settings.JWT_SECRET)
@@ -53,39 +55,27 @@ export const jwtService = {
         } catch (error) {
             return null
         }
-
-            /*const checkRefreshTokenInDb = await tokenRepositories.findToken(refreshToken)
-            if (checkRefreshTokenInDb) {
-                return null
-            } else {
-
-                const newAccessToken = jwt.sign({userId: decodedRefreshToken.userId}, settings.JWT_SECRET, {expiresIn: '10s'})
-                const newRefreshToken = jwt.sign({userId: decodedRefreshToken.id}, settings.JWT_SECRET, {expiresIn: '20s'})
-
-                const addOldTokenInDb =  await revokedTokenService.createToken(refreshToken)
-                // так можно ??
-
-                const jwtResult = {accessToken: newAccessToken, refreshToken: newRefreshToken}
-                return jwtResult
-            }*/
         },
 
     async verifyToken(refreshToken: string) {
 
         try {
         const decodedRefreshToken: any = jwt.verify(refreshToken, settings.JWT_SECRET)
-
+            //console.log(decodedRefreshToken)
         }  catch (error) {
         return null
     }
             const checkRefreshTokenInDb = await tokenRepositories.findToken(refreshToken)
+        //console.log(checkRefreshTokenInDb)
+
             if (checkRefreshTokenInDb) {
                 return null
-            }
-
+            } else {
                 const addOldTokenInDb = await revokedTokenService.createToken(refreshToken)
                 // так можно ??
+                //console.log(addOldTokenInDb)
 
                 return addOldTokenInDb
             }
+    }
 }
